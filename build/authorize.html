@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="format-detection" content="telephone=no, email=no" />
+    <title>混沌大学</title>
+</head>
+<body>
+<script type="text/javascript">
+        function get_url(prop){
+            var GETURL = {};
+            if (location.search.length) {
+                var args = location.search.slice(1).split('&');
+                for (var i = 0; i < args.length; i++) {
+                    var arg = args[i].split('=');
+                    GETURL[arg[0]] = arg[1];
+                }
+            }
+            return(GETURL[prop]);
+        }
+        //线上以及线下项目配置
+        var prod_name='htmlBin/mobile-app';
+
+        var userId=get_url('userId');
+
+        var appId='wx5ba7e61c94b8c010';
+        /***************************微信授权**********************************/
+        if(localStorage.getItem('openid')!='undefined' && localStorage.getItem('openid')!=null && localStorage.getItem('openid') && localStorage.getItem('nickname')!=null && localStorage.getItem('unionid')!=null&&localStorage.getItem('unionid')!='undefined' && localStorage.getItem('head_img') != null){
+
+            if(!userId||userId==="undefined"){
+                window.location.href='http://ttools.hundun.cn/'+prod_name+'/index.html';
+            }else{
+                window.location.href='http://ttools.hundun.cn/'+prod_name+'/index.html?userId='+userId;
+            }
+            
+        }else{
+            if(!userId||userId==="undefined"){
+                window.location.href='https://open.weixin.qq.com/connect/oauth2/authorize?appid='+appId+'&redirect_uri=http://ttools.hundun.cn/'+prod_name+'/index.html?&response_type=code&scope=snsapi_userinfo&state=2#wechat_redirect';
+            }else{
+                window.location.href='https://open.weixin.qq.com/connect/oauth2/authorize?appid='+appId+'&redirect_uri=http://ttools.hundun.cn/'+prod_name+'/index.html?userId='+userId+'&response_type=code&scope=snsapi_userinfo&state=2#wechat_redirect';
+            }
+            
+        }
+</script>
+</body>
+</html>

@@ -1,0 +1,385 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1, user-scalable=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="format-detection" content="telephone=no, email=no" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <title>手机号登录</title>
+    <script src="http://cdn.bootcss.com/jquery/1.11.3/jquery.min.js"></script>
+    <script src="http://web.hundun.cn/htmlBin/utils/dialog.js?v=0606"></script>
+    <script src="http://yxs-web.oss-cn-beijing.aliyuncs.com/member_join/wxh5share.js"></script>
+    <script>
+        // 1rem = 50px
+        (function (doc, win) {
+            var docEl = doc.documentElement,
+                    resizeEvt = 'orientationchange' in window ? 'orientationchange' : 'resize',
+                    recalc = function () {
+                        var clientWidth = docEl.clientWidth;
+                        if (!clientWidth) return;
+                        if (clientWidth > 750) {
+                            docEl.style.fontSize = '100px';
+                        } else {
+                            docEl.style.fontSize = 100 * (clientWidth / 750) + 'px';
+                        }
+                    };
+            if (!doc.addEventListener) return;
+            win.addEventListener(resizeEvt, recalc, false);
+            doc.addEventListener('DOMContentLoaded', recalc, false);
+            recalc();
+        })(document, window);
+        var showLoading = function(id) {
+            id = id || new Date().getTime().toString().substr(8);
+            $("<div class='ajax-loading'></div>").attr("id", id).appendTo("body").hide().fadeIn();
+            return id;
+        };
+        var hideLoading = function(){
+          var loading = $(".ajax-loading");
+          loading.hide(100, function (){
+              //loading.remove();
+          })
+        };
+        
+        var hideload=function(){
+            var _body=document.body;
+            var _hide=document.getElementsByClassName('ajax-loading')[0];
+            _body.removeChild(_hide);
+        }
+
+    </script>
+</head>
+<body>
+    <div id="title">
+        <div class="title_content">
+            请填写您的个人信息，礼品卡将自动发送到您的账户
+        </div>
+    </div>
+    <div id="box">
+        <div id="phone">
+            <div class="left" id="app">
+                <div class="show">+86</div>
+                <select id="country-list" onchange="change_country(this)">
+                </select>
+                <img src="http://yxs-app.oss-cn-beijing.aliyuncs.com/2809f7bd2fab84743243a25cd6800132" alt="">
+            </div>
+            <div class="center">
+                <input type="tel" name="" placeholder="请填写您的手机号码（必填）"/>
+            </div>
+        </div>
+        <div id="code">
+            <div class="left">
+                验证码
+            </div>
+            <div class="center bottom_center">
+                <input id="code-input" type="tel" name="" placeholder="请输入验证码">
+            </div>
+            <button class="right" onclick="get_code()">
+                  获取验证码  
+            </button>
+        </div>
+    </div>
+    <!-- <div id="enter" onclick="gain()">
+        立即领取
+    </div> -->
+    <div id="login" onclick="bind_phone()">
+        登录
+    </div>
+    <div id="tip">
+        登录则视为同意混沌大学 <a href="http://web.hundun.cn/htmlBin/service_protocol.html" style="color:rgb(94,145,215);font-size:13px;text-decoration:none;">服务协议</a>
+    </div>
+</body>
+<style>
+    #country-list{
+        opacity: 0
+    }
+    #app{
+        position: relative
+    }
+    #app .show{
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 1.2rem;
+        height: .4rem;
+    }
+    *{
+        margin: 0;
+        padding: 0;
+        box-sizing:border-box;
+        -webkit-box-sizing:border-box;
+        font-size: 14px;
+    }
+    .ajax-loading{
+          position: fixed;
+          top: 0;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(255, 255, 255, 0.7);
+          z-index: 999999;
+    }
+    @-webkit-keyframes loading {
+        0% {
+            -webkit-transform: rotateZ(0deg);
+            transform: rotateZ(0deg)
+        }
+        100% {
+            -webkit-transform: rotateZ(360deg);
+            transform: rotateZ(360deg)
+        }
+    }
+
+    @keyframes loading {
+        0% {
+            -webkit-transform: rotateZ(0deg);
+            transform: rotateZ(0deg)
+        }
+        100% {
+            -webkit-transform: rotateZ(360deg);
+            transform: rotateZ(360deg)
+        }
+    }
+    .ajax-loading:after {
+        content: '';
+        background-image: url(http://yxs-app.oss-cn-beijing.aliyuncs.com/0b13b9be5b41200d87a59e9d42cf35f9); 
+        background-size: cover;
+        width: 16px;
+        height: 16px;
+        margin: -8px -8px;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        -webkit-animation: loading 1s infinite linear;
+        animation: loading 1s infinite linear;
+    }
+    #box{
+        margin: 0.2rem 0.52rem 0.52rem 0.52rem; 
+        /* overflow: hidden */
+        font-size: 0.28rem;
+    }
+    #title{
+        margin:0.2rem 0.3rem;
+        display: none;
+    }
+    #title .title_content{
+        font-size: 14px;
+        line-height: 0.78rem;
+        color: #000;
+        font-weight: 800;
+    }
+    #user_name,#phone,#code{
+        border-bottom:1px solid rgb(205,205,205);
+        height: 1.06rem;
+        width: 6.48rem;
+        padding: .24rem 0;
+    }
+    #phone select{
+        width: 1.2rem
+    }
+    .left{
+        width: 1.56rem;
+        text-align: center;
+        color: #000;
+        font-weight: 800;
+        float: left;
+        position: relative;
+        line-height: .6rem;
+    }
+    .left img{
+        position: absolute;
+        right: 0.30rem;
+        top:0.16rem; 
+    }
+    .left select{
+        border:0;
+        color: rgb(215, 171, 112);
+        outline:none;
+        text-align: center;
+        padding-left: 0.20rem;
+        height: 90%;
+        -webkit-appearance: none;
+        background: #fff
+    }
+    .right{
+        width: 1.96rem;
+        float: left;
+        text-align: center;
+        background: none;
+        border: none;
+        border-left: 1px solid rgb(215, 171, 112);
+        color: rgb(215, 171, 112);
+        height: 0.6rem;
+        line-height: 0.6rem;
+    }
+    .center{
+        width: 4.9rem;
+        float: left;
+        line-height: .6rem;
+    }
+    .center input{
+        width: 4.5rem;
+        border:0;
+        outline: none;
+        height: 0.34rem;
+        font-size: 0.28rem;
+        line-height: 0.28rem
+    }
+    .bottom_center{
+        width: 2.94rem
+    }
+    #enter,#login{
+        margin: 1rem 0.3rem;
+        background: rgb(215, 171, 112);
+        text-align: center;
+        line-height: 0.88rem;
+        height: 0.88rem;
+        color: #fff;
+        font-size: 0.32rem;
+        border-radius: 0.06rem
+    }
+    #tip{
+        width: 100%;
+        color: rgb(153, 153, 153);
+        text-align: center;
+        padding-top: 4.0rem;
+        font-size: 0.26rem;
+    }
+    #tip span{
+        color: rgb(2,138,231)
+    }
+</style>
+<script>
+    var u_host ='//tuser.hundun.cn' ;//'http://123.57.143.47:8000';//'//tuser.hundun.cn';
+    //var u_host ='//user.hundun.cn' ;
+    var t_address = 'http://hdyxs.hundun.cn/Repo';
+    var open_url = 'http://tools.hundun.cn/Repo/htmlBin/new_schedule/schedule.html';
+    var clientType = 'h5';
+    var user_id = get_url('uid');
+    var open_id = window.localStorage.getItem('openid');
+    var send_id = get_url('send_id');
+    // if(open_id == 'undefined' || !open_id){
+    // 	location.href = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx45325d915de45e32&redirect_uri='+t_address+'/sevendays/index.html?send_id='+send_id+'&response_type=code&scope=snsapi_userinfo&state=2#wechat_redirect';
+    // }
+    var channel_type = get_url('channel_type');
+    var channel_info = get_url('channel_info');
+
+    var channelType=get_url('channelType');
+
+    var type = get_url('type');
+    var c_code = '+86';
+    if(type == 'gain'){
+        //$('#title').show();
+        $('#login').text('立即领取');
+    }
+    var get_code = function(){
+        var phone = $('#phone input').val();
+        if(!phone){
+            di.toast('请输入手机号');
+            return false;
+        }
+        if(c_code != '+86'){
+            phone = '00'+c_code.substring(1)+phone;
+        }
+        $('#code .right').attr('disabled',true);
+        setTimeout(function(){
+            $('#code .right').attr('disabled',false);
+        },1000)
+        $.get(u_host+'/get_identify_code?phone='+phone,function(res){
+            if(res.error_no == 0){
+                $('#code button').attr('disabled',true);
+                var time = 60;
+                var timer = setInterval(function(){
+                    time--;
+                    if(time == 0){
+                        time = '获取验证码';
+                        $('#code button').attr('disabled',false);
+                        clearInterval(timer);
+                    }
+                    $('#code button').text(time!='获取验证码'?time+' s':time);
+                },1000)
+            }
+        },'json')
+    };
+    var bind_phone = function(){
+        var code = $('#code-input').val();
+        var phone = $('#phone input').val();
+        
+        if(!phone){
+            di.toast('请输入手机号');
+            return false;
+        }
+        if(!code){
+            di.toast('请输入验证码');
+            return false;
+        }
+        if(c_code!='+86'){
+            phone = '00'+c_code.substring(1)+phone;
+        }
+        showLoading();
+        $.post(u_host+'/identify_code_login',JSON.stringify({
+            phone:phone,
+            identify_code:code
+        }),function(res){
+            if(res.error_no == 0){
+                var uid = res.data.uid;
+                var phone = res.data.phone;
+                var head_img=res.data.head_img;
+
+                var userType=res.data.type_id;
+                   window.localStorage.setItem('logined_user_id',uid);
+                if(userType===3){
+                   window.localStorage.setItem('isUser','NO');
+                   window.localStorage.setItem('wx_head_img',head_img);
+                }else{
+                   window.localStorage.setItem('isUser','YES');
+                   window.localStorage.setItem('wx_head_img',head_img);
+                }
+                if(!send_id||send_id=="undefined"){
+                   //alert('send_id'+send_id);
+                   window.location.href = './index.html?channelType='+channelType+'&user_id='+uid;
+                   //alert('./index.html?channelType='+channelType+'&send_id='+uid);
+                }else{
+                    //alert('send_id :'+send_id);
+                    //alert('user_id :'+user_id);
+                    alert('./index.html?channelType='+channelType+'&send_id='+send_id+'&user_id='+uid);
+                    //window.location.href = './index.html?channelType='+channelType+'&send_id='+send_id+'&user_id='+uid;
+                }
+                
+                hideLoading();
+                
+            }else{
+                di.toast(res.error_msg);
+                hideLoading();
+                
+            }
+        },'json').error(function(){
+            di.toast('网络繁忙');
+        })
+    };
+    var get_country = function(){
+        $.get(u_host+'/app/user_country_list?clientType=h5',function(res){
+            var country_list = res.data.country_list;
+            var len = country_list.length;
+            var temp = '';
+            for(var i=0;i<len;i++){
+                var selected = c_code==country_list[i].country_code?'selected':'';
+                temp+='<option '+selected+' value="'+country_list[i].country_code+'">'+country_list[i].country_name+' '+country_list[i].country_code+'</option>';
+            }
+            $('#country-list').html(temp);
+        },'json')
+    };
+    var change_country = function(el){
+        c_code = $('#country-list').val();
+        $('.show').text($('#country-list').val());
+    };
+    window.onload = function(){
+        get_country();
+    }
+</script>
+</html>
